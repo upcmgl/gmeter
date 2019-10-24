@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "G_METER_3", "G_METER_3\G_METER_3.cproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		__13761__|ARM = __13761__|ARM
+		__13761_JILIN__|ARM = __13761_JILIN__|ARM
+		__HEBEI_HUANBAO__|ARM = __HEBEI_HUANBAO__|ARM
+		__HJ212__|ARM = __HJ212__|ARM
+		__XINHE212__|ARM = __XINHE212__|ARM
+		Debug|ARM = Debug|ARM
+		Release|ARM = Release|ARM
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__13761__|ARM.ActiveCfg = __13761__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__13761__|ARM.Build.0 = __13761__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__13761_JILIN__|ARM.ActiveCfg = __13761_JILIN__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__13761_JILIN__|ARM.Build.0 = __13761_JILIN__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__HEBEI_HUANBAO__|ARM.ActiveCfg = __HEBEI_HUANBAO__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__HEBEI_HUANBAO__|ARM.Build.0 = __HEBEI_HUANBAO__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__HJ212__|ARM.ActiveCfg = __HJ212__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__HJ212__|ARM.Build.0 = __HJ212__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__XINHE212__|ARM.ActiveCfg = __XINHE212__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.__XINHE212__|ARM.Build.0 = __XINHE212__|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|ARM.ActiveCfg = Debug|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|ARM.Build.0 = Debug|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|ARM.ActiveCfg = Release|ARM
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|ARM.Build.0 = Release|ARM
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

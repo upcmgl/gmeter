@@ -1,0 +1,13 @@
+*.dat
+*.hex
+*.html
+*.png
+*.xml
+*.o
+*.d
+*.bin
+*.eep
+*.elf
+*.lss
+*.map
+*.srec

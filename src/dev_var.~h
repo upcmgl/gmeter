@@ -1,0 +1,446 @@
+#ifndef __DEV_VAR_H__
+#define __DEV_VAR_H__
+
+//#include "os.h"
+#include  "..\..\src\main_include.h"
+
+#define PROTOCOL_CHANNEL_REMOTE   1
+#define PROTOCOL_CHANNEL_METER    2
+#define PROTOCOL_CHANNEL_DEBUG    3
+#define PROTOCOL_CHANNEL_REMOTE_SERVER    4
+#define PROTOCOL_CHANNEL_INFRA    5
+#define PROTOCOL_CHANNEL_REMOTE2   6
+
+
+#define REQUEST_STATE_IDLE          0
+#define REQUEST_STATE_RECVING       1
+#define REQUEST_STATE_WAIT_PROCESS  2
+#define REQUEST_STATE_PROCESSING    3
+#define REQUEST_STATE_PROCESSED     4
+
+#define SIZE_OF_APP_PROTOCOL_FRAME  2100
+
+
+#define SIZE_OF_APP_PROTOCOL_FRAME_COAP 300
+
+typedef union{
+    INT16U value;
+    struct{
+        INT16U GDW1376:1;
+        INT16U GB645:1;
+        INT16U ONENET:1;
+        INT16U reserve:13;
+    };
+}tagProtocolFlag;
+
+typedef struct{
+    INT16U  pn;
+    INT16U  fn;
+    INT16U  pos_pnfn;
+    INT16U  pos_fn_td;
+    INT16U  left_resp_len;  //剩余的可响应缓冲空间
+    INT8U   check_flag;
+    INT8U   Td[7];
+    INT8U   phy_count;
+    INT16U  work_flag;    //标识抄读数据类型。日电能量 ：01 月电能量 02 曲线电能量 03 （日冻结数据 04 月冻结 05 曲线 0x0A） 抄表日 06  小时冻结 07 总加组 （日、月、曲线）总加组 08  预抄小时冻结09 iaDayhold 区分 日 月 曲线,0A 预抄数据
+    BOOLEAN need_more_frame;
+    BOOLEAN is_first_frame;
+}READ_CONTEXT;
+
+typedef union{
+    INT8U value[2];
+    struct{
+        INT8U last_count;
+        INT8U start_td[7];
+        INT8U end_td[7];
+        INT8U choice;        
+    }a;
+}SEPARATE_FRAME_PARAM; 
+   
+typedef union{
+    INT8U value[2];
+    struct{
+        INT16U index_id[3];
+        INT16U idx_start[4];
+        INT16U frame_id;
+        INT16U pos;
+        INT16U userdata_pos;
+        INT16U frame_len;
+        INT8U more_frame;
+        INT8U is_frist;
+        INT8U apdu_service_code;
+        INT8U batch_count;
+        INT8U idx_count;
+        INT8U prepare_param;
+        SEPARATE_FRAME_PARAM param;
+        INT8U frame[SIZE_OF_APP_PROTOCOL_FRAME];
+    };
+}SEPARATE_FRAME;
+
+typedef struct {
+    uint8_t  ref;
+    uint32_t mid;
+    uint8_t  result;
+    uint16_t objid;
+    int16_t  insid;
+    int32_t  resid;
+    uint8_t  type;
+    uint16_t len;
+    uint8_t  index;
+    uint8_t  flag;
+	uint8_t  msg_type;// 1 read 2 write 3 execute 4 notify
+    uint8_t  state;
+    uint32_t life_time;
+    uint16_t ackid;
+    uint8_t  event_id;
+}tagOneNet;
+
+typedef struct {
+    INT32U           send_time_in_10ms;
+    INT32U           recv_time_in_10ms;
+    INT16U           frame_len;
+    INT16U           recv_len;
+    INT16U           cs;
+    INT16U           pos;
+    INT16U           userdata_pos;
+    INT16U           addition_pos;
+    INT16U           userDataLen;
+    tagProtocolFlag  surported_protocol;
+    tagProtocolFlag  cur_protocol;
+    uint8_t          recv_success_flag;
+    INT8U            channel;
+    INT8U            state;
+	INT8U           *param;//TP
+    INT8U            rseq;//SEQ
+    INT8U           *context;//抄读参数
+    INT8U           *fn;//Fn抄读结构表
+    INT8U            item_count;
+    BOOLEAN          is_security;
+    INT8U            frame[SIZE_OF_APP_PROTOCOL_FRAME];
+    INT8U            security_info[30];//[0]-报文类别，0-明文 1-密文，[1]-解密结果，0-成功，其它-失败  [2]-数据验证信息，0-SID_MAC，1-RN，2-RN_MAC，3-SID
+}objRequest;
+typedef struct{
+    INT16U    pos;
+    INT16U    userdata_pos;
+    INT16U    max_reply_pos;
+    INT16U    frame_len;
+    INT8U     channel;
+    INT8U     work_flag[10];    //协议处理中保存一些处理状态
+    INT8U     frame[4+SIZE_OF_APP_PROTOCOL_FRAME];
+}objResponse;
+
+
+typedef struct _Date{
+     INT16S year;
+     INT16S  month;
+     INT16S  day;
+     INT16S  hour;
+     INT16S  minute; //增加或减分钟时，为了处理方便
+}CommandDate;
+
+typedef struct {
+    uint8_t app_is_ready;
+    uint8_t meter_no[6];
+	uint8_t managementNum[23];  //资产管理编号22位。其实电表中存储的是32位，只不过一些位为0x00
+    uint8_t ertu_devid[10];
+    uint8_t devid_len;
+    uint8_t apn[32];
+    uint8_t user[32];
+    uint8_t pwd[32];
+    uint8_t ip1[4];
+    uint8_t port1[2];
+    uint8_t ip2[4];
+    uint8_t port2[2];
+    uint8_t listen_port[2];
+    uint8_t online_mode;
+    uint8_t ppp_is_ok;//
+    uint8_t tcp_link;
+    uint8_t tcp_link2;
+    uint8_t tcp_valid;
+    uint8_t tcp_valid2;
+    uint8_t relink_cnt;
+    INT32U relink_timer;
+
+    uint8_t remote_client_linked;
+    uint8_t login_status;
+    uint8_t login_status2;
+    #ifdef __OOP_G_METER__
+    uint8_t heart_cycle[2];
+    #else
+    uint16_t heart_cycle;
+    #endif
+    uint8_t gprs_debug_flag;        //gprs报文调试
+    uint8_t meter_debug_flag;       //电表通信报文调试开关
+    uint8_t remote_app_debug_flag;  //gprs的应用层报文调试开关
+    uint8_t debug_info_interface;   //调试接口选择，0为debug串口输出，其他值为电表通信口输出
+    uint8_t clock_ready;            //时钟状态，0，终端未取到时钟，不能连接主站，
+    //gprs相关信息
+    uint8_t mygmr_info[26];
+    uint8_t myccid_info[20];
+    uint8_t imei_info[15];
+    uint8_t imsi_info[15];
+    uint8_t csq;
+    uint8_t ppp_ip[4];
+    uint8_t nouse_1376_3;
+    uint8_t remote_model_type;
+    uint8_t remote_model_vendor;
+    uint8_t is_nb_net;
+    uint8_t is_coap_net;
+    uint8_t rsrp[4];
+    uint8_t sinr[4];
+    uint8_t cellid[8];
+    uint8_t node_b[4];
+    uint32_t cell_id;//32U 
+    
+    uint16_t lvd;
+    uint16_t bat_mon;
+    uint16_t ad_temp;
+    int8_t   dev_temp;
+    uint8_t battery_charge;
+	uint8_t allow_charge;//1 允许充电 0 不允许充电 NB发送数据时不能给超级电容充电	
+    uint32_t batter_power_time;
+    uint8_t ertu_param_change;  //按位表示，0代表参数未改变，1代表参数改变。bit0:DT_F1....bit1:DT_F3....bit_2:DT_F16....bit_3:DT_F89
+    uint8_t has_data_report;  //有数据或事件上报 混合模式下需要连接TCP  按位标识有事件或数据上报
+    uint32_t life_time;
+    uint8_t cgatt;//是否附着网络 1 已经附着
+    uint32_t last_resource_ready;//1: 资源订阅完成 可以上报数据
+    uint32_t month_bytes;//流量统计
+    uint16_t day_bytes; //流量统计日流量
+    uint16_t ackid;
+    uint8_t local_status;//1 本地通讯成功 0 失败
+    uint8_t remote_status;//1 远程通讯有数据接收发送 0 无数据
+    uint8_t is_debug;//1 调试状态 其他 非调试状态
+    uint8_t update;//升级       如果edp协议升级的话启动升级flag 0xAA 开始 0xBB 正在升级 0xCC升级完成  DD失败
+    uint32_t update_begin_tick;//升级开始
+    uint32_t no_net_tick;//注册不到网络起始时间tick
+    uint32_t check_update_tick;//检查在线状态起始时标    
+    uint8_t ESAM_DEVID[8];
+    uint8_t ESAM_RAND[8];
+    uint8_t ESAM_CERT_STATE;
+    uint8_t esam_type;
+	
+	uint8_t usb_read;
+	uint8_t usb_write;
+	uint8_t *filename;
+	uint16_t offset;
+	uint8_t *data;
+	uint16_t len;
+	uint8_t reconnect;
+	uint32_t switch_param;//默认参数功能切换开关
+	INT8U  noResponseCnt;   //电表未响应次数，为了避免一次电表不响应然后本地灯熄灭的问题。
+	INT8U  usb_plug;
+#ifdef __OOP_G_METER__
+	uint8_t dayHodeMode; //日冻结模式；
+	uint8_t plan_task_chg;/* 方案任务改变标志 */
+	DateTime dt; /* 方案任务变更时 存储时间 ，用于更新使用 */	
+
+#endif
+#ifdef __EDP__
+	INT8U save_ack;
+	INT8U dev_config_ack;   //模块上报了配置报文后，才可以解析命令，这个时间已经在上电15秒后了
+	INT8U edp_login_state;
+	INT8U edp_ping_state;
+	INT8U edp_report_interval;
+	INT8U edp_enable_report_store;  //使能上报那些存储的未上报成功的数据。
+	INT32U edp_over_flow_A;        //A 相过流
+	INT32U edp_over_flow_B;        //B 相过流
+	INT32U edp_over_flow_C;        //C 相过流
+	INT32U edp_open_meter;			//开表盖次数
+	INT32U edp_clean_meter;         //电表清0次数
+#ifdef __ZHEJIANG_ONENET_EDP__
+	INT32U edp_event_SZDCQY;       //时钟电池欠压事件
+	INT32U edp_event_SDTSD;        //市电停上电事件
+	INT32U edp_event_FZDYTSD;      //辅助电源停上电事件
+	INT32U edp_event_YGGLFX;       //有功功率方向
+	INT32U edp_event_WGGLFX;       //无功功率方向
+	INT32U edp_event_AXDX;          //A相断相
+	INT32U edp_event_BXDX;          //B相断相
+	INT32U edp_event_CXDX;          //C相断相
+#endif	
+	INT8U  edp_warning_ack;
+	INT8U  edp_rand_report_begin;   // 设置随机延后时间范围,开始时间
+	INT8U  edp_rand_report_end;   // 设置随机延后时间范围,结束时间
+	INT8U  edp_first_poweron;     //edp协议模块第一次上电
+	INT8U  edp_second_connet;    //edp协议模块重新
+#endif
+}tagSystemInfo;
+
+
+typedef struct
+{
+    INT8U cur_date[3];          //统计时间    排列顺序-日月年
+    INT8U day_bytes[4];         //日通信流量
+    INT8U month_bytes[4];       //月通信流量
+}tagAPP_GPRS_BYTES;
+typedef struct
+{
+    INT8U is_control_valid;  //控制参数是否有效
+    INT8U turn_off[2];          //跳闸时间
+    INT8U turn_on[2];           //合闸时间
+}tagAPP_CONTROL;
+
+typedef struct
+{
+    INT8U               cur_time[6];//当前系统时间
+    tagAPP_GPRS_BYTES   gprs_bytes;  //GPRS流量统计
+    tagAPP_CONTROL      meter_control;    //拉合闸预置参数
+    INT8U               password[4];//密码权限
+    uint32_t status;//按位标识模组状态置1有效 D0:模块本地通信成功 D1:已注网 D2：已登陆
+}tagAPP_RUN_DATA;
+   
+typedef union{
+   INT8U  value[4];
+   struct{
+    INT8U     times[3];//次数
+    INT8U     state;//发生 :0xAA 恢复：0x55 
+   };    
+}tagEVENT;
+
+//typedef struct{
+     //INT8U   acd;
+     //INT8U   ec1;         //重要事件计数器
+     //INT8U   ec2;         //一般事件计数器
+////     INT8U   alarm_event;//显示告警使用
+////     INT8U   ercflag[8]; //F8事件变更标志位BS64
+////     INT8U   event_ec[4];//32位的事件计数器
+////     INT8U   report_flag[256];
+////     INT8U   report_idx;
+//}tagGlobalEVENT;
+
+#define UPDATE_PACKET_BUFFER_SIZE  512
+//程序升级对象结构
+typedef struct
+{
+    FSFILE* usbFile;
+	INT8U update_group_flag;//是否按组升级
+    INT8U is_transmit_reverse;//反转传输
+    
+    INT16U frame_count;//帧数量
+    INT8U frame_crc[32];
+    INT16U total_sec_count;//总段数
+    INT16U sec_size;//段大小
+    INT8U  sec_status[512];//一帧1024，可支持512*8*1024=4M, 一帧512，可以支持2M
+    INT8U buffer[UPDATE_PACKET_BUFFER_SIZE];
+}tagUPDATE_OBJECT;
+
+typedef struct{
+    INT32U filesize;
+    INT32U attachsize;
+    INT16U filetype;
+    INT16U filever;
+    INT8U  md5[16];
+    INT8U  updatetspec[4];
+    INT8S   updatetver[4];
+    INT8S   areacode[4];
+    INT8U  updatetdate[3];
+    INT8U  encryptno;
+    INT8U  updatettype;
+    INT8U  temp[3];
+    INT8U  attachfile[20];
+    INT8U  device_code_flag[64];
+}DATHEADER;
+
+typedef union
+{
+    INT8U value;
+    struct{
+        INT8U ok_flag:1;     //正常异常标志
+        INT8U valid_flag:1;  //有效无效标志
+        INT8U reserve:6;    //备用
+    };
+}tagPOWER_ONOFF_PROPFLAG;
+
+typedef union{
+   INT8U  value[14];
+   struct{
+      INT8U power_flag;
+      tagPOWER_ONOFF_PROPFLAG   prop_flag;  //发生时间  分-时-日-月-年
+      INT8U     power_off_time[6];
+      INT8U     power_on_time[6];
+   };
+}tagPOWER_ONOFF_RECORD;
+
+#ifdef __ONENET__
+typedef struct{
+    uint8_t *send_ptr;
+    uint16_t send_len;
+    uint16_t recv_pos;
+    uint16_t read_pos;
+    uint8_t  recv_buf[SIZE_OF_APP_PROTOCOL_FRAME];
+    uint8_t  send_buf[SIZE_OF_APP_PROTOCOL_FRAME];
+    uint8_t  ref;
+    uint32_t mid;
+    uint8_t  result;
+    uint16_t objid;
+    int16_t  insid;
+    int32_t  resid;
+    uint8_t  type;
+    uint16_t len;
+    uint8_t  index;
+    uint8_t  flag;
+	uint8_t  msg_type;// 1 read 2 write 3 execute 4 notify
+    uint8_t  state;
+    uint32_t life_time;
+    uint16_t ackid;
+}tagWirelessObj;
+
+typedef union{
+    INT8U  value[36];
+    struct{
+       tagDatetime      monthhold_report_time;     //上一次月冻结上报时间
+       tagDatetime      dayhold_report_time;     //上一次日冻结上报时间
+       tagDatetime      cycle_report_time;     //上一次当前数据上报时间
+       INT16U           rpt_flag;//需要上报的数据标志
+       INT16U           rpt_idx;//resource id表中的idx 
+       INT16U           ack_idx;//平台回复idx
+    };
+}TASK_INFO;
+#else
+typedef struct{
+    uint8_t *send_ptr;
+    uint16_t send_len;
+    uint16_t recv_pos;
+    uint16_t read_pos;
+    uint8_t  recv_buf[SIZE_OF_APP_PROTOCOL_FRAME];
+}tagWirelessObj;
+#endif
+
+extern objMutex SIGNAL_FLASH;
+extern objMutex SIGNAL_METER_UART;
+extern objMutex SIGNAL_DEBUG_UART;
+extern objMutex SIGNAL_INFRA_UART;
+extern objMutex SIGNAL_FILE_OP;
+extern objMutex SIGNAL_REMOTE_UART;
+extern objMutex SIGNAL_REMOTE_UART_SEND;
+extern objMutex    SIGNAL_SYSTEMINFO;
+extern objMutex    SIGNAL_METER;
+extern objMutex SIGNAL_EASM;
+extern objMutex   SIGNAL_TEMP_BUFFER;
+extern objMutex   SIGNAL_EVENT;
+extern objMutex SIGNAL_RUN_DATA;
+
+
+extern objRequest  RequestRemote,RequestRemote2;
+extern objRequest  RequestRemoteServer;
+extern objRequest  RequestUart;
+extern objRequest  RequestDebug;
+
+extern objResponse ResponseApp;
+extern objRequest  RequestInfra;
+
+extern SEPARATE_FRAME separate_frame_mem;
+
+extern tagSystemInfo gSystemInfo;
+extern tagAPP_RUN_DATA g_app_run_data;
+//
+//extern tagGlobalEVENT g_event;
+
+extern tagUPDATE_OBJECT update_object;    //程序升级对象
+extern DATHEADER update_header;                  //升级文件头对象
+
+extern uint8_t g_meter_set_flag;
+#ifdef __ONENET__
+extern tagWirelessObj RequestOnenet,ReportOnenet;
+extern TASK_INFO task;
+#endif
+#endif
