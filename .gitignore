@@ -4,6 +4,7 @@
 *.png
 *.xml
 *.o
+*.a
 *.d
 *.bin
 *.eep
